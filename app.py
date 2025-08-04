@@ -3,6 +3,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from nonono import MY_SECRET_KEY
 from forms import convertCurrency
+from calc import convert_currency
 
 app = Flask(__name__)
 
@@ -20,7 +21,7 @@ def index():
 
 
 @app.route('/convert', methods=['GET', 'POST'])
-def convert_currency():
+def convert_currency_view():
     """ Convert one currency to another """
 
     form = convertCurrency()
@@ -31,6 +32,15 @@ def convert_currency():
         
         # Here you would typically call a function to perform the conversion
         print(f'Converting {amount} from {from_currency} to {to_currency}')
+
+        converted_amount = convert_currency(amount, from_currency, to_currency)
+        if converted_amount is None:
+            flash('Error converting currency. Please check your input.', 'danger')
+            return redirect('/convert') 
+        
+        flash(f'Converted {amount} {from_currency} to  {to_currency} which is: {converted_amount}', 'success')
+        
+
 
         # For now, we will just flash a message and redirect
         flash(f'Converted {amount} from {from_currency} to {to_currency}', 'success')
